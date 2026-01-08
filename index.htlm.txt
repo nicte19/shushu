@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prototipo Rural (Productores + Animales + Ovinos)</title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">🐑 Prototipo Rural</div>
+    <div class="tabs">
+      <button class="tabbtn active" data-tab="productores">Productores (con animales)</button>
+      <button class="tabbtn" data-tab="procedimiento">Procedimiento (Ovinos)</button>
+      <button class="tabbtn" data-tab="insumos">Insumos</button>
+      <button class="tabbtn" data-tab="reportes">Reportes</button>
+    </div>
+    <div class="pill">
+      <span>Productor/a activo:</span>
+      <b id="activeProducerName">Ninguno</b>
+    </div>
+  </div>
+
+  <!-- PRODUCTORES -->
+  <div id="tab_productores">
+    <div class="grid">
+      <div class="card">
+        <h2>👩‍🌾 Productores</h2>
+        <p class="sub">Crea productores/as con ubicación, foto, familia y animales dentro del mismo registro.</p>
+
+        <label>Nombre del productor/a</label>
+        <input id="p_nombre" placeholder="Ej. Doña Lupita" />
+
+        <div class="row">
+          <div>
+            <label>Edad</label>
+            <input id="p_edad" type="number" min="0" placeholder="Ej. 45" />
+          </div>
+          <div>
+            <label>Escolaridad</label>
+            <input id="p_escolaridad" placeholder="Ej. Secundaria" />
+          </div>
+          <div>
+            <label>Personas en casa</label>
+            <input id="p_personasCasa" type="number" min="0" placeholder="Ej. 5" />
+          </div>
+        </div>
+
+        <label>Localización (comunidad/municipio/estado)</label>
+        <input id="p_localizacion" placeholder="Ej. Coatlaco, Almoloya, Hidalgo" />
+
+        <div class="row">
+          <div>
+            <label>Latitud</label>
+            <input id="p_lat" type="number" step="0.000001" placeholder="Ej. 19.432608" />
+          </div>
+          <div>
+            <label>Longitud</label>
+            <input id="p_lng" type="number" step="0.000001" placeholder="Ej. -99.133209" />
+          </div>
+          <div style="display:flex; align-items:end;">
+            <button id="btnGPS" class="secondary" type="button">📍 Tomar mi ubicación</button>
+          </div>
+        </div>
+
+        <label>Foto de la fachada (opcional)</label>
+        <input id="p_foto" type="file" accept="image/*" />
+        <img id="p_fotoPreview" class="photo hidden" alt="Vista previa fachada" />
+
+        <div class="divider"></div>
+
+        <h3>👪 Familia (miembro + actividad)</h3>
+
+        <div class="row">
+          <div>
+            <label>Miembro</label>
+            <input id="fam_miembro" placeholder="Ej. Juan (hijo)" />
+          </div>
+          <div>
+            <label>Actividad que realiza</label>
+            <input id="fam_actividad" placeholder="Ej. Albañil" />
+          </div>
+          <div style="display:flex; align-items:end;">
+            <button id="btnAddFamily" class="secondary" type="button">➕ Agregar fila</button>
+          </div>
+        </div>
+
+        <table>
+          <thead><tr><th>Miembro</th><th>Actividad</th><th></th></tr></thead>
+          <tbody id="fam_table"></tbody>
+        </table>
+
+        <button id="btnSaveProducer" type="button">💾 Guardar productor/a</button>
+        <button id="btnClearProducer" class="secondary" type="button">Limpiar formulario</button>
+
+        <div class="divider"></div>
+        <div class="warn">
+          Para agregar animales, primero guarda un productor/a o selecciona uno de la lista.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📋 Productor/a activo y sus animales</h2>
+        <p class="sub">Aquí están los animales dentro del productor seleccionado.</p>
+
+        <div id="producerList"></div>
+
+        <div class="divider"></div>
+
+        <div id="animalsInlineBox" class="hidden">
+          <h3>🐾 Agregar animal al productor/a activo</h3>
+
+          <div class="row">
+            <div>
+              <label>Nombre / especie</label>
+              <input id="a_especie" placeholder="Ej. Borregos, Gallinas, Vacas..." />
+            </div>
+            <div>
+              <label>Cantidad</label>
+              <input id="a_cantidad" type="number" min="0" placeholder="Ej. 12" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Raza (si vacío → Criolla)</label>
+              <input id="a_raza" placeholder="Ej. Dorset / Criolla" />
+            </div>
+            <div>
+              <label>Función</label>
+              <input id="a_funcion" placeholder="Ej. Carne, leche, venta..." />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Propietario de la especie</label>
+              <select id="a_propietario"></select>
+            </div>
+            <div>
+              <label>Notas (opcional)</label>
+              <input id="a_notas" placeholder="Ej. Lote 1 / Corral atrás..." />
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <h3>🧠 Decisiones (qué decisión y quién)</h3>
+          <p class="sub">Ejemplos: Venta — Juan, Consumo — Lupita, Reproducción — Pedro.</p>
+
+          <div class="row">
+            <div>
+              <label>Decisión</label>
+              <input id="dec_accion" placeholder="Ej. Venta / Consumo / Reproducción" />
+            </div>
+            <div>
+              <label>Quién decide (productora o familiar)</label>
+              <select id="dec_quien"></select>
+            </div>
+            <div style="display:flex; align-items:end;">
+              <button id="btnAddDecision" class="secondary" type="button">➕ Agregar</button>
+            </div>
+          </div>
+
+          <table>
+            <thead><tr><th>Decisión</th><th>Quién</th><th></th></tr></thead>
+            <tbody id="dec_table"></tbody>
+          </table>
+
+          <div class="divider"></div>
+          <h3>🍽️ Alimentación (acción + quién + tipo)</h3>
+          <p class="sub">Ejemplos acción: dar alimento, dar agua, comprar alimento, preparar mezcla.</p>
+
+          <div class="row">
+            <div>
+              <label>Acción</label>
+              <input id="ali_accion" placeholder="Ej. Dar alimento" />
+            </div>
+            <div>
+              <label>Quién lo hace</label>
+              <select id="ali_quien"></select>
+            </div>
+            <div>
+              <label>Tipo de alimentación</label>
+              <input id="ali_tipo" placeholder="Ej. Pastoreo / Rastrojo / Concentrado / Suplemento" />
+            </div>
+          </div>
+          <button id="btnAddFeeding" class="secondary" type="button">➕ Agregar fila de alimentación</button>
+
+          <table>
+            <thead><tr><th>Acción</th><th>Quién</th><th>Tipo</th><th></th></tr></thead>
+            <tbody id="ali_table"></tbody>
+          </table>
+
+          <button id="btnSaveAnimal" type="button">💾 Guardar animal</button>
+
+          <div class="divider"></div>
+          <h3>📌 Animales registrados del productor/a activo</h3>
+          <div id="animalsList"></div>
+        </div>
+
+        <div id="noActiveProducerBox" class="warn">
+          Selecciona un productor/a para ver y agregar animales aquí.
+        </div>
+
+        <div class="divider"></div>
+        <button id="btnReset" class="danger" type="button">🧨 Borrar TODO (reset)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROCEDIMIENTO -->
+  <div id="tab_procedimiento" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>💉 Procedimiento (solo ovinos)</h2>
+        <p class="sub">Peso (báscula/cinta) + medicamento + (opcional) consumibles. El total se multiplica por el número de animales tratados.</p>
+
+        <div id="needProducer_proc" class="warn hidden">
+          Selecciona un productor/a en “Productores”.
+        </div>
+
+        <div id="needOvino_proc" class="warn hidden">
+          Este productor/a no tiene “borregos/ovinos” registrados. Agrega “Borregos” dentro del productor.
+        </div>
+
+        <div id="procBox" class="hidden">
+          <label>Selecciona el registro de ovinos</label>
+          <select id="proc_ovinoSelect"></select>
+
+          <div class="row">
+            <div>
+              <label>¿En cuántos animales se hará el procedimiento?</label>
+              <input id="proc_numAnimales" type="number" min="1" step="1" value="1" />
+              <div class="sub" id="proc_maxInfo"></div>
+            </div>
+            <div class="box" style="flex: 1 1 220px;">
+              <div class="sub"><b>Nota:</b> medicamento y consumibles se toman “por animal” y se multiplican por el número tratado.</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <p><b>¿Cómo deseas obtener el peso? (por animal)</b></p>
+          <div class="row">
+            <button id="btnBascula" class="secondary" type="button">⚖️ Báscula</button>
+            <button id="btnCinta" class="secondary" type="button">📏 Cinta métrica</button>
+          </div>
+
+          <div id="basculaBox" class="hidden">
+            <label>Peso en kg</label>
+            <input id="pesoBascula" type="number" step="0.01" placeholder="Ej. 35.2">
+            <button id="btnSavePesoBascula" type="button">Guardar peso</button>
+          </div>
+
+          <div id="cintaBox" class="hidden">
+            <label>Perímetro torácico (cm)</label>
+            <input id="pt" type="number" step="0.1" placeholder="Ej. 85">
+            <label>Largo corporal (cm)</label>
+            <input id="lc" type="number" step="0.1" placeholder="Ej. 75">
+            <button id="btnCalcCinta" type="button">Calcular peso</button>
+          </div>
+
+          <p id="pesoMostrado" class="badge"></p>
+
+          <div id="medicamentoBox" class="hidden">
+            <h3>💊 Medicamento (por animal)</h3>
+            <label>Seleccionar medicamento</label>
+            <select id="medicamentoSelect"></select>
+            <button id="btnCalcMed" type="button">Calcular dosis</button>
+            <div id="resultadoMed" class="ok hidden"></div>
+          </div>
+
+          <div id="insumosUsoBox" class="hidden">
+            <h3>🧰 Consumibles usados (opcional, por animal)</h3>
+            <p class="sub">Ejemplo: jeringa 1 por animal. El sistema multiplica por # animales tratados.</p>
+
+            <div class="row">
+              <div>
+                <label>Consumible</label>
+                <select id="insumoSelect"></select>
+              </div>
+              <div>
+                <label>Cantidad (por animal)</label>
+                <input id="insumoCant" type="number" min="1" value="1" />
+              </div>
+              <div style="display:flex; align-items:end;">
+                <button id="btnAddInsumoUso" class="secondary" type="button">➕ Agregar</button>
+              </div>
+            </div>
+
+            <table>
+              <thead><tr><th>Consumible</th><th>Cant. (x animal)</th><th>Subtotal (x animal)</th><th>Subtotal total</th><th></th></tr></thead>
+              <tbody id="insumosUsoTable"></tbody>
+            </table>
+          </div>
+
+          <div id="registroBox" class="hidden">
+            <h3>📝 Guardar procedimiento</h3>
+            <label>Identificación / nota (opcional)</label>
+            <input id="idBorrego" placeholder="Ej. Lote 1 / Borrego 12 / etc.">
+            <label>Notas</label>
+            <textarea id="procNotas" placeholder="Observaciones..."></textarea>
+
+            <div class="total">Total procedimiento: $<span id="procTotal">0.00</span></div>
+            <div class="sub" id="procBreakdown"></div>
+
+            <button id="btnSaveProc" type="button">💾 Guardar procedimiento</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📚 Historial (ovinos)</h2>
+        <p class="sub">Procedimientos guardados para el productor/a activo.</p>
+        <div id="procHistory"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSUMOS -->
+  <div id="tab_insumos" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>💊 Insumos: Medicamentos</h2>
+        <p class="sub">Editar y agregar medicamentos.</p>
+
+        <label>Medicamento</label>
+        <select id="medEditar"></select>
+
+        <label>Nombre</label>
+        <input id="medNombre" placeholder="Ej. Selenio" />
+
+        <div class="row">
+          <div><label>Dosis (mg/kg)</label><input id="medDosis" type="number" step="0.01" placeholder="Ej. 0.25" /></div>
+          <div><label>Concentración (mg/mL)</label><input id="medConc" type="number" step="0.01" placeholder="Ej. 10.95" /></div>
+        </div>
+
+        <div class="row">
+          <div><label>Volumen frasco (mL)</label><input id="medVol" type="number" step="0.01" placeholder="Ej. 50" /></div>
+          <div><label>Precio frasco ($)</label><input id="medPrecio" type="number" step="0.01" placeholder="Ej. 350" /></div>
+        </div>
+
+        <button id="btnUpdateMed" type="button">💾 Guardar cambios</button>
+        <button id="btnAddMed" class="secondary" type="button">➕ Agregar nuevo</button>
+        <button id="btnDelMed" class="danger" type="button">🗑️ Borrar medicamento</button>
+      </div>
+
+      <div class="card">
+        <h2>🧰 Insumos: Consumibles</h2>
+        <p class="sub">Ej. jeringas, agujas, vendas… se cobran por unidad.</p>
+
+        <label>Consumible</label>
+        <select id="consEditar"></select>
+
+        <label>Nombre</label>
+        <input id="consNombre" placeholder="Ej. Jeringa 5 mL" />
+
+        <div class="row">
+          <div><label>Unidad</label><input id="consUnidad" placeholder="Ej. pieza" /></div>
+          <div><label>Precio unitario ($)</label><input id="consPrecio" type="number" step="0.01" placeholder="Ej. 2.50" /></div>
+        </div>
+
+        <button id="btnUpdateCons" type="button">💾 Guardar cambios</button>
+        <button id="btnAddCons" class="secondary" type="button">➕ Agregar nuevo</button>
+        <button id="btnDelCons" class="danger" type="button">🗑️ Borrar consumible</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORTES -->
+  <div id="tab_reportes" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>📈 Reportes (básico)</h2>
+        <p class="sub">Totales para el productor/a activo.</p>
+        <div id="repBox"></div>
+      </div>
+
+      <div class="card">
+        <h2>🧾 Detalle</h2>
+        <p class="sub">Procedimientos guardados.</p>
+        <div id="repList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="./script.js" defer></script>
+</body>
+</html>
